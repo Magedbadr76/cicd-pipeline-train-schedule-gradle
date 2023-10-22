@@ -1,0 +1,38 @@
+plugins {
+    // id("com.moowork.node") version "1.3.1"
+    id("com.github.node-gradle.node") version "2.2.0"
+}
+
+node {
+    download = true
+    version = "12.13.1"
+    npmVersion = "6.9.0"
+    yarnVersion = "1.17.3"
+    nodeModulesDir = project.file("ui")
+    workDir = project.file("${project.buildDir}/nodejs")
+    npmWorkDir = project.file("${project.buildDir}/npm")
+    yarnWorkDir = project.file("${project.buildDir}/yarn")
+}
+
+task build
+
+//declare a task to create a zip of the app
+task zip(type: Zip) {
+	from ('.') {
+		include "*"
+		include "bin/**"
+		include "data/**"
+		include "node_modules/**"
+		include "public/**"
+		include "routes/**"
+		include "views/**"
+	}
+	destinationDir(file("dist"))
+	baseName "trainSchedule"
+}
+build.dependsOn zip
+zip.dependsOn npm_build
+build.dependsOn npm_build
+npm_build.dependsOn npm_i
+npm_build.dependsOn npm_test
+npm_test.dependsOn npm_i
